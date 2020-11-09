@@ -66,7 +66,7 @@ video.addEventListener('play',async ()=>{
 });
 
 
-var imgLink = 'https://drive.google.com/drive/u/0/folders/1EOjfyqH6D2sgcdgEA-vG5J75YPCYhSP2';
+var imgLink = 'https://github.com/samcladson/Face-Recognition/tree/master/Images';
 var staffList=['Latha','Sam_Cladson','Sam_Nishanth','Simson']
 
 const encodings =()=>{
@@ -75,7 +75,7 @@ return Promise.all(
     staffList.map(async staff=>{
         const descriptions = []
         for(var i=0;i<=2;i++){
-            const img = await faceapi.fetchImage(`https://cors-anywhere.herokuapp.com/${imgLink}/${staff}/${i}.jpg`)
+            const img = await faceapi.fetchImage(`${imgLink}/${staff}/${i}.jpg`)
             const detection = await faceapi.detectSingleFace(img)
             .withFaceLandmarks()
             .withFaceDescriptor()
