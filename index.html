@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+    <script defer src="./face-api.min.js"></script>
+    <script defer src='./script.js' type="module"></script>
+</head>
+<body>
+    <div class="header"><h2>Face Recognition</h2></div>
+    <div class="left-container">
+        <h2>Stand stedy while we capture your face!</h2>
+        <video id="video" height="=270" width="360" autoplay muted></video>
+        <div class="controll m-4 d-flex">
+            <button class="btn btn-primary m-1" onclick="stream('start')">Capture</button>
+            <button class="btn btn-warning m-1" onclick="stream('close')">Close</button>
+        </div>
+    </div>
+    <div class="right-container">
+
+    </div>
+    
+    
+</body>
+<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+<style>
+    body{
+        margin: 0;
+        padding: 0;
+        
+    }
+    .header{
+        height: 8vh;
+        padding: 25px;
+    }
+    .controll{
+        position: absolute;
+        top:75%;
+        left: 48%;
+        transform: translate(-50%,-50%);
+    }
+
+
+    video{
+        position: absolute;
+        top:48%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        border: 2px solid coral;
+    }
+    canvas{
+        position: absolute;
+        width: 360px;
+        height: 270px;
+        top:48%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+    }
+    .left-container{
+        position: absolute;
+        padding: 25px;
+        width: 50vw;
+        height: 76vh;
+        
+    }
+</style>
+</html>
