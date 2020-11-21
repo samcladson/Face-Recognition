@@ -8,9 +8,9 @@ CORS(app, support_credentials=True)
 
 @app.route('/')
 def main():
-    staff_names = ["Sam Cladson", "Sam Nishanth", "Simson", "Latha"]
-    return jsonify(staff_names)
+
+    return ''
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
