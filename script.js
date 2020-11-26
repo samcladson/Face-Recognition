@@ -1,6 +1,4 @@
 var encodedData;
-// var globalData;
-// accessing models
 
 Promise.all([
   faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
@@ -123,7 +121,6 @@ const rightContainer = document.querySelector(".right-container");
 const cardStyle =
   " width:150px;height:75px;border-radius:5px;padding:15px;box-shadow:0 8px 6px -6px black;margin:10px";
 const createEntry = (data) => {
-  console.log(data);
   const div = document.createElement("div");
   div.setAttribute("class", "card");
   div.setAttribute("style", cardStyle);

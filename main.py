@@ -9,7 +9,7 @@ CORS(app, support_credentials=True)
 @app.route('/')
 def main():
 
-    return ''
+    return 'Hello World'
 
 
 if __name__ == "__main__":
