@@ -21,23 +21,36 @@ const clearArray = () => {
   faceData = [];
 };
 
+const startVideo = () => {
+  canvas = document.createElement("canvas");
+  container.appendChild(canvas);
+  navigator.getUserMedia(
+    { video: {} },
+    (stream) => (video.srcObject = stream),
+    (err) => console.log(err)
+  );
+};
+
+const stopVideo = () => {
+  canvas && canvas.remove();
+  clearArray();
+  clearInterval(trackFace);
+  video.srcObject.getTracks().forEach((track) => {
+    track.stop();
+  });
+};
+
 // configure video
 const Stream = (data) => {
   if (data === "close") {
-    canvas && canvas.remove();
-    clearArray();
-    clearInterval(trackFace);
-    video.srcObject.getTracks().forEach((track) => {
-      track.stop();
-    });
+    stopVideo();
+  } else if (data === "retake") {
+    // removing canvas and stoping video
+    stopVideo();
+    startVideo();
+    // creating canvas and strating video
   } else {
-    canvas = document.createElement("canvas");
-    container.appendChild(canvas);
-    navigator.getUserMedia(
-      { video: {} },
-      (stream) => (video.srcObject = stream),
-      (err) => console.log(err)
-    );
+    startVideo();
   }
 };
 
