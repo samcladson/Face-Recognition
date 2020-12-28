@@ -94,6 +94,7 @@ const startVideo = (data) => {
 
 const stopVideo = async (data) => {
   if (data === "close") {
+    toast ? (toast.style.display = "none") : null;
     btnControl(data);
   }
 
