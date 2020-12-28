@@ -74,65 +74,69 @@ const btnControl = (data) => {
   }
 };
 
-const startVideo = (data) => {
-  toast ? (toast.style.display = "none") : null;
-  count = 0;
-
-  btnControl(data);
-
-  const getCanvas = document.querySelector("canvas");
-  if (!getCanvas) {
-    canvas = document.createElement("canvas");
-    videoContainer.appendChild(canvas);
-  }
-  navigator.getUserMedia(
-    { video: {} },
-    (stream) => (video.srcObject = stream),
-    (err) => console.log(err)
-  );
+const startVideo = async (data) => {
+  return await new Promise((resolve, reject) => {
+    try {
+      toast ? (toast.style.display = "none") : null;
+      count = 0;
+      btnControl(data);
+      const getCanvas = document.querySelector("canvas");
+      if (!getCanvas) {
+        canvas = document.createElement("canvas");
+        videoContainer.appendChild(canvas);
+      }
+      navigator.getUserMedia(
+        { video: {} },
+        (stream) => (video.srcObject = stream),
+        (err) => console.log(err)
+      );
+      resolve(true);
+    } catch (error) {
+      if (error) reject(error);
+    }
+  });
 };
 
 const stopVideo = async (data) => {
-  if (data === "close") {
-    toast ? (toast.style.display = "none") : null;
-    btnControl(data);
-  }
+  return await new Promise((resolve, reject) => {
+    try {
+      if (data === "close") {
+        toast ? (toast.style.display = "none") : null;
+        btnControl(data);
+      }
+      canvas ? canvas.remove() : null;
+      faceData = [];
+      staffName = "";
+      clearInterval(trackFace);
+      clearTimeout(timeout);
+      clearInterval(timeInterval);
+      timerData.innerHTML = "";
 
-  canvas ? canvas.remove() : null;
-  faceData.length = 0;
-  staffName = "";
-  await clearInterval(trackFace);
-  await clearTimeout(timeout);
-  await clearInterval(timeInterval);
-  timerData.innerHTML = "";
-
-  video.srcObject
-    ? video.srcObject.getTracks().forEach((track) => {
-        track.stop();
-      })
-    : null;
-  video.srcObject ? (video.srcObject = null) : null;
+      video.srcObject
+        ? video.srcObject.getTracks().forEach((track) => {
+            track.stop();
+          })
+        : null;
+      video.srcObject ? (video.srcObject = null) : null;
+      resolve(true);
+    } catch (error) {
+      if (error) reject(error);
+    }
+  });
 };
 
 // configure video
 const Stream = (data) => {
   if (data === "close") {
     stopVideo(data);
-    return;
   } else if (data === "retake") {
     // removing canvas and stoping video
-    stopVideo(data);
-
-    startVideo(data);
-
-    return;
+    stopVideo(data).then(() => startVideo(data));
     // creating canvas and strating video
   } else if (data === "manual") {
     stopVideo(data);
   } else {
     startVideo(data);
-
-    return;
   }
 };
 
@@ -191,10 +195,8 @@ const timer = () => {
   }, 1000);
 };
 
-// Capture image
+// Capture image frame and encode data
 video.addEventListener("playing", () => {
-  // encodedData ? null : encodings();
-
   trackFace = setInterval(async () => {
     var detection = await faceapi
       .detectSingleFace(video)
@@ -216,12 +218,9 @@ video.addEventListener("playing", () => {
       if (faceData.length == 1) {
         count += 1;
         if (count === 1) {
-          // const txt = document.querySelector("textarea");
-          // txt.value = faceData[0].descriptor;
           var data = {
             encode: Array.from(faceData[0].descriptor),
           };
-          // console.log(faceData[0].descriptor);
           fetch("https://face-recognition-siet.herokuapp.com/face", {
             method: "POST",
             headers: {
@@ -245,6 +244,7 @@ video.addEventListener("playing", () => {
               console.log(err);
             });
         }
+        canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
         const labeledFrame = new faceapi.draw.DrawBox(
           resizedDetections.detection.box,
           {
@@ -260,5 +260,5 @@ video.addEventListener("playing", () => {
         faceapi.draw.drawDetections(canvas, resizedDetections);
       }
     }
-  }, 100);
+  }, 650);
 });
