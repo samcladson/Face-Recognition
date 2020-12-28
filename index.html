@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+      crossorigin="anonymous"
     />
-    <script defer src="./face-api.min.js"></script>
+    <script defer src="js/face-api.min.js"></script>
   </head>
   <body>
     <div
@@ -16,23 +18,108 @@
       style="height: 100vh"
     >
       <h2>Face Recognition</h2>
-      <video id="video" autoplay muted></video>
+      <h4 id="timer"></h4>
+      <!-- toast -->
+
+      <div
+        id="toast"
+        class="toast"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div
+          class="toast-header d-flex justify-content-between align-items-center"
+        >
+          <strong class="mr-auto toast-title"> </strong>
+          <small class="toast-small">11 mins ago</small>
+        </div>
+        <div class="toast-body">Hello, world! This is a toast message.</div>
+      </div>
+
+      <!-- toast ends -->
+      <div class="video-container">
+        <video id="video" autoplay muted></video>
+      </div>
       <div class="controll m-4 d-flex">
-        <button class="btn btn-primary m-1" onclick="Stream('start')">
+        <!-- <button class="btn btn-primary m-1" onclick="Stream('start')">
           Capture
-        </button>
-        <button class="btn btn-danger m-1" onclick="Stream('close')">
-          Close
-        </button>
-        <button class="btn btn-secondary m-1" onclick="Stream('retake')">
-          Retake
-        </button>
+        </button> -->
+        <div class="action-btns">
+          <button class="btn btn-danger m-1" onclick="Stream('close')">
+            Close
+          </button>
+          <button class="btn btn-secondary m-1" onclick="Stream('retake')">
+            Retake
+          </button>
+          <button
+            class="btn btn-warning m-1"
+            onclick="Stream('manual')"
+            data-bs-toggle="modal"
+            data-bs-target="#modal"
+          >
+            Cancel and enter manualy
+          </button>
+        </div>
+        <!-- checkin/checkout -->
+        <div class="check-in-out">
+          <button
+            class="btn btn-primary m-1"
+            onclick="checking('checkIn'),Stream('start')"
+          >
+            Check in
+          </button>
+          <button
+            class="btn btn-warning m-1"
+            onclick="checking('checkOut'),Stream('start')"
+          >
+            Check out
+          </button>
+        </div>
       </div>
     </div>
-    <!-- <div class="right-container"></div> -->
+    <div
+      id="modal"
+      class="modal fade"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5>Register your entry</h5>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <select
+                class="form-control"
+                name="staffName"
+                id="select"
+                placeholder="Enter your name.."
+              >
+                <options value="Enter name">Enter Name</options>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-success btn-block"
+              onclick="manualDataSave()"
+            >
+              Save Entry
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
   <script defer src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
-  <script defer src="script.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+    crossorigin="anonymous"
+  ></script>
+  <script defer src="js/script.js"></script>
   <style>
     body {
       margin: 0;
@@ -40,8 +127,7 @@
     }
 
     video {
-      position: relative;
-      margin-top: 50px;
+      display: none;
       border-radius: 15px;
       box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
     }
@@ -49,6 +135,34 @@
       position: absolute;
       width: 360px;
       height: 270px;
+    }
+    .video-container {
+      margin-top: 25px;
+      position: relative;
+      display: flex;
+    }
+
+    .action-btns {
+      display: none;
+    }
+    input {
+      outline: none;
+    }
+    #options {
+      display: flex;
+      flex-direction: column;
+    }
+    span {
+      color: grey;
+      padding: 10px;
+      border-bottom: 1px solid lightgrey;
+    }
+    .toast {
+      opacity: 1 !important;
+      display: none;
+    }
+    .toast-title {
+      color: green;
     }
   </style>
 </html>
