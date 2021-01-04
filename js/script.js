@@ -177,7 +177,7 @@ const SaveData = () => {
         }`;
       });
     Stream("retake");
-  }, 10000);
+  }, 5000);
 };
 
 const manualDataSave = () => {
@@ -188,7 +188,7 @@ const manualDataSave = () => {
 };
 
 const timer = () => {
-  var countTime = 10;
+  var countTime = 5;
   timeInterval = setInterval(() => {
     timerData.innerHTML = "Saving Data in " + countTime;
     countTime -= 1;
