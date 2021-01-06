@@ -23,7 +23,9 @@ var checking_type;
 var timeInterval;
 
 var staffNameList;
-var lst = Array();
+
+var waitTime;
+
 // Element Declaration
 const video = document.getElementById("video");
 video.height = 270;
@@ -37,6 +39,8 @@ const toast = document.querySelector("#toast");
 const toastTitle = document.querySelector(".toast-title");
 const toastBody = document.querySelector(".toast-body");
 const toastSmall = document.querySelector(".toast-small");
+const loader = document.querySelector("#loader");
+
 // populating options data
 fetch("https://face-recognition-siet.herokuapp.com/getName", {
   method: "GET",
@@ -74,27 +78,53 @@ const btnControl = (data) => {
   }
 };
 
+const reset = () => {
+  video.style.display = "none";
+  canvas ? canvas.remove() : null;
+  faceData = [];
+  staffName = "";
+  clearInterval(trackFace);
+  clearTimeout(timeout);
+  clearInterval(timeInterval);
+  clearInterval(waitTime);
+  loader.innerHTML = "";
+  timerData.innerHTML = "";
+};
+
 const startVideo = async (data) => {
-  return await new Promise((resolve, reject) => {
-    try {
-      toast ? (toast.style.display = "none") : null;
-      count = 0;
-      btnControl(data);
-      const getCanvas = document.querySelector("canvas");
-      if (!getCanvas) {
-        canvas = document.createElement("canvas");
-        videoContainer.appendChild(canvas);
+  // time delay loader
+  var load = 3;
+  loader.style.display = "block";
+  waitTime = setInterval(() => {
+    loader.innerHTML = load;
+    load -= 1;
+  }, 1000);
+
+  setTimeout(async () => {
+    clearInterval(waitTime);
+    loader.style.display = "none";
+    video.style.display = "block";
+    return await new Promise((resolve, reject) => {
+      try {
+        toast ? (toast.style.display = "none") : null;
+        count = 0;
+        btnControl(data);
+        const getCanvas = document.querySelector("canvas");
+        if (!getCanvas) {
+          canvas = document.createElement("canvas");
+          videoContainer.appendChild(canvas);
+        }
+        navigator.getUserMedia(
+          { video: {} },
+          (stream) => (video.srcObject = stream),
+          (err) => console.log(err)
+        );
+        resolve(true);
+      } catch (error) {
+        if (error) reject(error);
       }
-      navigator.getUserMedia(
-        { video: {} },
-        (stream) => (video.srcObject = stream),
-        (err) => console.log(err)
-      );
-      resolve(true);
-    } catch (error) {
-      if (error) reject(error);
-    }
-  });
+    });
+  }, 3750);
 };
 
 const stopVideo = async (data) => {
@@ -102,16 +132,12 @@ const stopVideo = async (data) => {
     try {
       if (data === "close") {
         toast ? (toast.style.display = "none") : null;
+        loader.style.display = "none";
         btnControl(data);
+      } else {
+        loader.style.display = "block";
       }
-      canvas ? canvas.remove() : null;
-      faceData = [];
-      staffName = "";
-      clearInterval(trackFace);
-      clearTimeout(timeout);
-      clearInterval(timeInterval);
-      timerData.innerHTML = "";
-
+      reset();
       video.srcObject
         ? video.srcObject.getTracks().forEach((track) => {
             track.stop();
@@ -126,13 +152,15 @@ const stopVideo = async (data) => {
 };
 
 // configure video
+
 const Stream = (data) => {
   if (data === "close") {
     stopVideo(data);
   } else if (data === "retake") {
-    // removing canvas and stoping video
-    stopVideo(data).then(() => startVideo(data));
-    // creating canvas and strating video
+    // removing canvas, stoping video and creating canvas, strating video
+    stopVideo(data).then(() => {
+      startVideo(data);
+    });
   } else if (data === "manual") {
     stopVideo(data);
   } else {
@@ -146,6 +174,19 @@ const checking = (data) => {
   } else {
     checking_type = data;
   }
+};
+
+const createEntry = (response) => {
+  toast.style.display = "block";
+  toastTitle.innerHTML = `<b>${response.Name}</b>`;
+  toastSmall.innerHTML = response.Date;
+  toastBody.innerHTML = `<b>Check-In Time :</b> ${response.Check_in_Time}<br>
+        <b>Check-Out time :</b> ${
+          response.Check_out_Time ? response.Check_out_Time : "N/A"
+        }<br>
+        <b>Working Hours :</b> ${
+          response.Working_Hours ? response.Working_Hours : "N/A"
+        }`;
 };
 
 const SaveData = () => {
@@ -163,18 +204,7 @@ const SaveData = () => {
     )
       .then((res) => res.json())
       .then((response) => {
-        toast.style.display = "block";
-        toastTitle.innerHTML = `<b>${response.Name}</b>`;
-        toastSmall.innerHTML = response.Date;
-        toastBody.innerHTML = `<b>Check-In Time :</b> ${
-          response.Check_in_Time
-        }<br>
-        <b>Check-Out time :</b> ${
-          response.Check_out_Time ? response.Check_out_Time : "N/A"
-        }<br>
-        <b>Working Hours :</b> ${
-          response.Working_Hours ? response.Working_Hours : "N/A"
-        }`;
+        createEntry(response);
       });
     Stream("retake");
   }, 5000);
